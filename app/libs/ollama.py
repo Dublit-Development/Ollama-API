@@ -18,47 +18,6 @@ class MultiModelSupport:
 
         return model_names
 
-    def run_model_generate(self):
-        model_names = self.list_installed_models()
-
-        all_responses = {}
-
-        for model in model_names:
-            quoted_question = shlex.quote(self.question)
-            quoted_content = shlex.quote(self.content)
-
-            data_payload = {
-                "model": model,
-                "prompt": quoted_question,
-                "content": quoted_content,
-                "stream": "false",
-                "options": {
-                    'temperature':"0.95"
-                }
-            }
-
-            json_data = json.dumps(data_payload)
-
-            process = subprocess.Popen(['curl', 'http://localhost:11434/api/chat', '-d', json_data],
-                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            output, error = process.communicate()
-
-            output_str = output.decode('utf-8')
-
-            if process.returncode != 0:
-                print(f"Error running command. Error message: {error.decode('utf-8')}")
-                return
-
-            try:
-                responses = [json.loads(response) for response in output_str.strip().split('\n')]
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON response. Error message: {e}")
-                return
-
-            all_responses[model] = responses
-
-        return all_responses
-
     def run_model_chat(self):
         model_names = self.list_installed_models()
 
@@ -104,5 +63,4 @@ class MultiModelSupport:
 question = "What's the weather like?"
 content = "We are located in Washington State."
 multi_support = MultiModelSupport(question, content)
-print(multi_support.run_model_generate())
 print(multi_support.run_model_chat())
