@@ -31,6 +31,7 @@ class MultiModelSupport:
                 "model": model,
                 "prompt": quoted_question,
                 "content": quoted_content,
+                "stream": "false",
                 "options": {
                     'temperature':"0.95"
                 }
@@ -49,7 +50,7 @@ class MultiModelSupport:
                 return
 
             try:
-                responses = [json.loads(response)["response"] for response in output_str.strip().split('\n')]
+                responses = [json.loads(response) for response in output_str.strip().split('\n')]
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON response. Error message: {e}")
                 return
@@ -58,7 +59,7 @@ class MultiModelSupport:
 
         return all_responses
 
-    def run_multi_model_chat(self):
+    def run_model_chat(self):
         model_names = self.list_installed_models()
 
         all_responses = {}
@@ -101,7 +102,7 @@ class MultiModelSupport:
 
 # Example usage:
 question = "What's the weather like?"
-content = "The state the person resides is in Washington State."
+content = "We are located in Washington State."
 multi_support = MultiModelSupport(question, content)
 print(multi_support.run_model_generate())
-print(multi_support.run_multi_model_chat())
+print(multi_support.run_model_chat())
